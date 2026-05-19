@@ -1,0 +1,9 @@
+model: claude-haiku-4-5-20251001
+max_candidates_per_week: 200
+triage_threshold_text: 18
+promotion_threshold: null
+lane_oss_cutoff: 3
+greenfield_min_reach: 7
+greenfield_min_validation: 7
+budget_warn_usd: 60
+budget_abort_usd: 100

@@ -1,0 +1,47 @@
+[
+    {
+        "reviewId": "abc-1",
+        "userName": "ops_lead",
+        "content": "Sync is broken after the last update. We lose Slack notifications half the time. Looking at competitors now.",
+        "score": 2,
+        "at": "2026-05-15T10:30:00",
+        "thumbsUpCount": 12,
+        "reviewCreatedVersion": "4.2.1"
+    },
+    {
+        "reviewId": "abc-2",
+        "userName": "fan_42",
+        "content": "Best PM tool I've used.",
+        "score": 5,
+        "at": "2026-05-16T09:00:00",
+        "thumbsUpCount": 0,
+        "reviewCreatedVersion": "4.2.1"
+    },
+    {
+        "reviewId": "abc-3",
+        "userName": "freelance_dev",
+        "content": "I'd pay 2x if you brought back the offline mode. Currently I use Toggl alongside this just for that one feature.",
+        "score": 3,
+        "at": "2026-05-17T08:15:00",
+        "thumbsUpCount": 4,
+        "reviewCreatedVersion": "4.2.0"
+    },
+    {
+        "reviewId": "abc-4",
+        "userName": null,
+        "content": "no name here",
+        "score": 1,
+        "at": "2026-05-12T14:00:00",
+        "thumbsUpCount": 0,
+        "reviewCreatedVersion": "4.1.9"
+    },
+    {
+        "reviewId": "abc-5",
+        "userName": "long_time_user",
+        "content": "From before the window.",
+        "score": 2,
+        "at": "2026-03-01T12:00:00",
+        "thumbsUpCount": 0,
+        "reviewCreatedVersion": "4.0.0"
+    }
+]

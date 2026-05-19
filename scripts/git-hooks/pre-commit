@@ -1,0 +1,17 @@
+#!/bin/sh
+# Pre-commit guard for unsafe yaml.load() usage in src/.
+# Enforces docs/opportunity-finder-design-doc.md §10:
+# "Use yaml.safe_load exclusively. Never yaml.load."
+#
+# Activate in a fresh clone with:
+#   git config core.hooksPath scripts/git-hooks
+
+set -e
+
+UNSAFE=$(grep -rnF "yaml.load(" src/ 2>/dev/null | grep -vF "yaml.safe_load(" || true)
+
+if [ -n "$UNSAFE" ]; then
+    echo "pre-commit: unsafe yaml.load() detected — use yaml.safe_load() instead:" >&2
+    echo "$UNSAFE" >&2
+    exit 1
+fi

@@ -1,0 +1,56 @@
+{
+    "askstories": [100, 102, 103],
+    "showstories": [300],
+    "items": {
+        "100": {
+            "id": 100,
+            "type": "story",
+            "by": "founder42",
+            "time": 1779408000,
+            "title": "Ask HN: best lightweight CRM for solo realtors?",
+            "text": "I'm a solo agent doing 25 closings/year. Sheets is buckling. What do you use?",
+            "kids": [200, 201, 202]
+        },
+        "102": {
+            "id": 102,
+            "type": "story",
+            "by": "ghost",
+            "time": 1779408000,
+            "title": "Ask HN: dead post",
+            "dead": true
+        },
+        "103": {
+            "id": 103,
+            "type": "story",
+            "by": "ancient",
+            "time": 1700000000,
+            "title": "Ask HN: way too old",
+            "text": "from 2023"
+        },
+        "200": {
+            "id": 200,
+            "type": "comment",
+            "by": "broker_b",
+            "text": "I run Pipedrive — $15/mo and it just works."
+        },
+        "201": {
+            "id": 201,
+            "type": "comment",
+            "deleted": true
+        },
+        "202": {
+            "id": 202,
+            "type": "comment",
+            "by": "appraiser_c",
+            "text": "Followup Boss if you can stomach the price."
+        },
+        "300": {
+            "id": 300,
+            "type": "story",
+            "by": "buildr",
+            "time": 1779408000,
+            "title": "Show HN: a meeting-notes summarizer for sales reps",
+            "text": "Built this because I was tired of writing recaps. Free for now."
+        }
+    }
+}

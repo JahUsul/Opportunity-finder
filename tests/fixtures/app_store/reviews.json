@@ -1,0 +1,42 @@
+[
+    {
+        "userName": "frustrated_pm",
+        "rating": 2,
+        "title": "Crashes every time I open a recurring event",
+        "review": "I've been using this for two years and it crashed three times this week alone. Sync to Google is unreliable. I paid for premium and now it's worse than before.",
+        "date": "2026-05-15T10:30:00",
+        "isEdited": false
+    },
+    {
+        "userName": "happy_user",
+        "rating": 5,
+        "title": "Love it",
+        "review": "Five star app, no notes.",
+        "date": "2026-05-16T09:00:00",
+        "isEdited": false
+    },
+    {
+        "userName": "solo_realtor",
+        "rating": 1,
+        "title": "Where did the iPad layout go?",
+        "review": "Update broke the iPad layout. Cannot find my saved templates anymore. I'd pay double for the old version back.",
+        "date": "2026-05-17T08:15:00",
+        "isEdited": false
+    },
+    {
+        "userName": "",
+        "rating": 3,
+        "title": "Anon feedback",
+        "review": "Some neutral thoughts.",
+        "date": "2026-05-14T12:00:00",
+        "isEdited": false
+    },
+    {
+        "userName": "long_time_user",
+        "rating": 2,
+        "title": "Used to be great",
+        "review": "From before the window.",
+        "date": "2026-03-01T12:00:00",
+        "isEdited": false
+    }
+]

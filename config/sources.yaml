@@ -1,0 +1,44 @@
+reddit:
+  subreddits:
+    - automation
+    - aiautomations
+    - realtors
+    - realestateadvice
+    - entrepreneur
+    - smallbusiness
+    - consulting
+    - saas
+    - freelance
+    - sales
+  min_score: 5
+  min_comments: 3
+  lookback_days: 7
+
+hn:
+  query_types: [ask_hn, show_hn]
+  lookback_days: 7
+
+app_store:
+  app_ids: []
+  categories: [productivity, business, lifestyle]
+  lookback_days: 7
+  ratings: [1, 2, 3]
+
+play_store:
+  app_ids: []
+  lookback_days: 7
+  ratings: [1, 2, 3]
+
+indeed:
+  queries:
+    - "operations associate"
+    - "data analyst"
+    - "business analyst"
+    - "marketing operations"
+  lookback_days: 7
+  fallback: apify
+
+wellfound:
+  queries: []
+  lookback_days: 7
+  fallback: apify
