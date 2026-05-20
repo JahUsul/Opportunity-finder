@@ -15,12 +15,14 @@ This doc is the build spec. The one-pager is the why and the what; this is the h
 | Decision | Choice |
 |---|---|
 | Hosting | Local cron on Jason's machine |
-| Output store | Google Sheets (via gspread + service account) |
+| Output store | Google Sheets (via gspread OAuth user credentials) |
 | LLM provider | Anthropic Claude Haiku |
 | Notification | Email to harris.jason121@gmail.com when sheet is ready |
 | Backlog | `/opportunities/[short-name]/one-pager.md` per promoted idea |
 | Language | Python 3.11+ |
 | Schedule | Fridays 06:00 local |
+
+*OAuth rather than service account:* The original spec called for a service account JSON key. Google's organization policy `iam.disableServiceAccountKeyCreation` blocked key creation on 2026-05-19, so we pivoted to OAuth user credentials. This aligns with the doctrine's principle of avoiding long-lived keys on disk (the OAuth refresh token is shorter-lived and revocable) and matches Google's own "more secure alternative" guidance. The Friday cron is fully non-interactive after a one-time browser auth bootstraps the token cache.
 
 ---
 
@@ -296,14 +298,14 @@ If no GitHub match for a candidate with strong text signals (pain+money+buyer �
 
 ```python
 class SheetWriter:
-    def __init__(self, service_account_path: str, spreadsheet_id: str):
+    def __init__(self, oauth_client_path: str, oauth_token_path: str, spreadsheet_id: str):
         ...
 
     def write_week(self, candidates: list[Candidate], week_date: date) -> str:
         """Create a new tab YYYY-MM-DD, write headers + rows, return tab URL."""
 ```
 
-Uses `gspread`. Service account JSON path from `.env`. The target spreadsheet is created manually once, ID stored in `.env`.
+Uses `gspread.oauth(credentials_filename=oauth_client_path, authorized_user_filename=oauth_token_path)`. The target spreadsheet is created manually once, ID stored in `.env`. First run requires interactive browser auth; subsequent runs use the cached refresh token.
 
 Top 50 by `machine_total` written to the tab. Rest are written to a sibling tab `YYYY-MM-DD-overflow` for posterity (no human review expected, but kept for trend analysis).
 
@@ -447,7 +449,8 @@ budget_abort_usd: 100
 ```
 ANTHROPIC_API_KEY=...
 GITHUB_TOKEN=...                          # personal access token, read-only on public repos
-GOOGLE_SHEETS_SA_PATH=secrets/gsheet-sa.json
+GOOGLE_OAUTH_CLIENT_PATH=config/secrets/oauth_client.json
+GOOGLE_OAUTH_TOKEN_PATH=config/secrets/oauth_token.json
 SHEET_ID=...
 APIFY_TOKEN=...                           # optional, for job-source fallback
 SMTP_HOST=smtp.gmail.com
@@ -562,7 +565,7 @@ No CI in v0. Tests run on demand via `uv run pytest`.
 
 **Secrets handling.** All secrets in `.env` (gitignored). Google service account JSON in `config/secrets/` (gitignored). Service account has access only to the one designated spreadsheet; no other Google scope.
 
-**Pipeline isolation (per security doctrine).** This project's `.env` lives only in this repo. Service account scoped to one sheet. Apify token scoped to read-only scraping actors. Anthropic key is a project-specific key (not the master), revocable independently. The cron user is Jason's normal local user — no separate sandbox VM in v0; isolation is by credential scope, not by execution context.
+**Pipeline isolation (per security doctrine).** This project's `.env` lives only in this repo. OAuth client scoped to Sheets API only; cached refresh token revocable from the user's Google account at https://myaccount.google.com/permissions. Apify token scoped to read-only scraping actors. Anthropic key is a project-specific key (not the master), revocable independently. The cron user is Jason's normal local user — no separate sandbox VM in v0; isolation is by credential scope, not by execution context.
 
 **Supply chain hygiene (per OSS guide).** Versions pinned in `pyproject.toml` lockfile, never `latest`. Before any milestone closes that introduces a new dependency, run `uv pip audit` (or `pip-audit`) and review the results. One-shot vet required for less-known scraping libraries (`app-store-scraper`, `google-play-scraper`) before milestone 3 closes: confirm license, recent commit cadence, maintainer identity, and any open CVEs. Document the verdict in the milestone PR.
 
