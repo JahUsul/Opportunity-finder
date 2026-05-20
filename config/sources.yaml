@@ -1,43 +1,494 @@
 reddit:
   subreddits:
-    - automation
-    - aiautomations
-    - realtors
-    - realestateadvice
-    - entrepreneur
-    - smallbusiness
-    - consulting
-    - saas
-    - freelance
-    - sales
+  - automation
+  - aiautomations
+  - realtors
+  - realestateadvice
+  - entrepreneur
+  - smallbusiness
+  - consulting
+  - saas
+  - freelance
+  - sales
   min_score: 5
   min_comments: 3
   lookback_days: 7
-
 hn:
-  query_types: [ask_hn, show_hn]
+  query_types:
+  - ask_hn
+  - show_hn
   lookback_days: 7
-
 app_store:
-  app_ids: []
-  categories: [productivity, business, lifestyle]
+  app_ids:
+  - id: '6448311069'
+    name: ChatGPT
+  - id: '6473753684'
+    name: Claude by Anthropic
+  - id: '6477489729'
+    name: Google Gemini
+  - id: '6756442328'
+    name: Instants, an Instagram app
+  - id: '983156458'
+    name: Microsoft Authenticator
+  - id: '284815942'
+    name: Google
+  - id: '310633997'
+    name: WhatsApp Messenger
+  - id: '6446901002'
+    name: Threads
+  - id: '1056813463'
+    name: Dunkin'
+  - id: '1500855883'
+    name: 'CapCut: Photo & Video Editor'
+  - id: '1113153706'
+    name: Microsoft Teams
+  - id: '585027354'
+    name: Google Maps
+  - id: '422689480'
+    name: Gmail - Email by Google
+  - id: '1558240027'
+    name: Meta AI - Assistant & Glasses
+  - id: '1488269261'
+    name: 'Whatnot: Shop, Sell, Connect'
+  - id: '1223471316'
+    name: 'Shop: All your favorite brands'
+  - id: '309735670'
+    name: Indeed Job Search
+  - id: '835599320'
+    name: TikTok - Videos, Shop & LIVE
+  - id: '389801252'
+    name: Instagram
+  - id: '284882215'
+    name: Facebook
+  - id: '878577184'
+    name: SHEIN - Shopping Online
+  - id: '1641486558'
+    name: 'Temu: Shop Like a Billionaire'
+  - id: '535886823'
+    name: Google Chrome
+  - id: '6670324846'
+    name: Grok - AI Chat & Video
+  - id: '338137227'
+    name: 'Walmart: Shopping & Savings'
+  - id: '544007664'
+    name: YouTube
+  - id: '951937596'
+    name: Microsoft Outlook
+  - id: '545519333'
+    name: Amazon Prime Video
+  - id: '6447582581'
+    name: Netflix Game Controller
+  - id: '6751921248'
+    name: Rips by Triumph
+  - id: '686449807'
+    name: Telegram Messenger
+  - id: '368677368'
+    name: Uber - Request a ride
+  - id: '333903271'
+    name: X
+  - id: '401626263'
+    name: Airbnb
+  - id: '324684580'
+    name: 'Spotify: Music and Podcasts'
+  - id: '719972451'
+    name: 'DoorDash: Food, Grocery, More'
+  - id: '711923939'
+    name: Cash App
+  - id: '1111876388'
+    name: T-Life
+  - id: '897446215'
+    name: 'Canva: AI Video & Photo Editor'
+  - id: '1508186374'
+    name: 'Peacock TV: Stream TV & Movies'
+  - id: '384830320'
+    name: 'Life360: Stay Connected & Safe'
+  - id: '283646709'
+    name: PayPal - Pay, Send, Save
+  - id: '297606951'
+    name: Amazon Shopping
+  - id: '399857015'
+    name: Planet Fitness
+  - id: '507874739'
+    name: Google Drive
+  - id: '382952264'
+    name: MyChart
+  - id: '632064380'
+    name: 'Vinted: Pre-loved marketplace'
+  - id: '407558537'
+    name: Capital One Mobile
+  - id: '518684914'
+    name: Depop - Buy & Sell Clothes
+  - id: '1096918571'
+    name: Google Meet
+  categories:
+  - productivity
+  - business
+  - lifestyle
   lookback_days: 7
-  ratings: [1, 2, 3]
-
+  ratings:
+  - 1
+  - 2
+  - 3
 play_store:
-  app_ids: []
+  app_ids:
+  - id: com.openai.chatgpt
+    name: ChatGPT
+    category: productivity
+  - id: com.google.android.apps.docs.editors.docs
+    name: Google Docs
+    category: productivity
+  - id: com.microsoft.office.word
+    name: 'Microsoft Word: Edit Documents'
+    category: productivity
+  - id: com.google.android.keep
+    name: Google Keep - Notes and lists
+    category: productivity
+  - id: com.facebook.stella
+    name: Meta AI - Assistant & Glasses
+    category: productivity
+  - id: ai.x.grok
+    name: Grok - AI Chat & Video
+    category: productivity
+  - id: com.google.android.apps.bard
+    name: Google Gemini
+    category: productivity
+  - id: com.anthropic.claude
+    name: Claude by Anthropic
+    category: productivity
+  - id: com.google.android.apps.docs.editors.sheets
+    name: Google Sheets
+    category: productivity
+  - id: com.adobe.reader
+    name: 'Adobe Acrobat Reader: Edit PDF'
+    category: productivity
+  - id: ai.perplexity.app.android
+    name: Perplexity - Ask Anything
+    category: productivity
+  - id: com.microsoft.office.excel
+    name: 'Microsoft Excel: Spreadsheets'
+    category: productivity
+  - id: com.google.android.calendar
+    name: Google Calendar
+    category: productivity
+  - id: com.google.android.apps.docs.editors.slides
+    name: Google Slides
+    category: productivity
+  - id: com.microsoft.skydrive
+    name: Microsoft OneDrive
+    category: productivity
+  - id: com.google.android.apps.labs.language.tailwind
+    name: Google NotebookLM
+    category: productivity
+  - id: com.microsoft.appmanager
+    name: Link to Windows
+    category: productivity
+  - id: com.microsoft.office.powerpoint
+    name: Microsoft PowerPoint
+    category: productivity
+  - id: com.dropbox.android
+    name: 'Dropbox: Secure Cloud Storage'
+    category: productivity
+  - id: com.scaleup.chatai
+    name: AI Chatbot - Nova
+    category: productivity
+  - id: com.intsig.camscanner
+    name: CamScanner- scanner, PDF maker
+    category: productivity
+  - id: com.rsupport.mvagent
+    name: Mobizen Screen Recorder
+    category: productivity
+  - id: com.microsoft.office.officehubrow
+    name: Microsoft 365 Copilot
+    category: productivity
+  - id: com.duckduckgo.mobile.android
+    name: DuckDuckGo, Duck.ai, & VPN
+    category: productivity
+  - id: com.google.android.apps.subscriptions.red
+    name: Google One
+    category: productivity
+  - id: com.okta.android.auth
+    name: Okta Verify
+    category: productivity
+  - id: com.hp.android.printservice
+    name: HP Print Service Plugin
+    category: productivity
+  - id: com.google.android.apps.tasks
+    name: Google Tasks
+    category: productivity
+  - id: mega.privacy.android.app
+    name: MEGA
+    category: productivity
+  - id: com.aloha.browser
+    name: Aloha Browser - Private VPN
+    category: productivity
+  - id: com.atomczak.notepat
+    name: Notepad - simple notes
+    category: productivity
+  - id: com.github.android
+    name: GitHub
+    category: productivity
+  - id: com.chrome.beta
+    name: Chrome Beta
+    category: productivity
+  - id: com.alphainventor.filemanager
+    name: File Manager
+    category: productivity
+  - id: qrcodereader.barcodescanner.scan.qrscanner
+    name: 'QR Scanner: Barcode Scanner'
+    category: productivity
+  - id: com.gstarmc.android
+    name: DWG FastView-CAD Viewer&Editor
+    category: productivity
+  - id: shareit.lite
+    name: SHAREit Lite - Fast File Share
+    category: productivity
+  - id: ru.mail.cloud
+    name: 'Cloud: Video, photo storage'
+    category: productivity
+  - id: com.ilovepdf.www
+    name: 'iLovePDF: PDF Editor & Scanner'
+    category: productivity
+  - id: com.cv.docscanner
+    name: Document Scanner - PDF Creator
+    category: productivity
+  - id: ru.yandex.disk
+    name: Yandex Disk –  Cloud Storage
+    category: productivity
+  - id: cn.wps.moffice_eng
+    name: WPS Office-PDF, Word, Sheet
+    category: productivity
+  - id: pdf.reader.pdfviewer.pdfeditor
+    name: PDF Reader - PDF Editor
+    category: productivity
+  - id: com.pdfreader.pdfpoint
+    name: PDF Reader Point
+    category: productivity
+  - id: com.google.android.apps.docs
+    name: Google Drive
+    category: productivity
+  - id: com.microsoft.teams
+    name: Microsoft Teams
+    category: business
+  - id: com.indeed.android.jobsearch
+    name: Indeed Job Search
+    category: business
+  - id: com.doordash.driverapp
+    name: DoorDash - Dasher
+    category: business
+  - id: com.adpmobile.android
+    name: ADP Mobile Solutions
+    category: business
+  - id: com.adobe.scan.android
+    name: Adobe Scan AI PDF Scanner, OCR
+    category: business
+  - id: com.ubercab.driver
+    name: 'Uber - Driver: Drive & Deliver'
+    category: business
+  - id: com.google.android.apps.dynamite
+    name: Google Chat
+    category: business
+  - id: com.amazon.flex.rabbit
+    name: Amazon Flex
+    category: business
+  - id: com.ukg.oneapp
+    name: UKG Pro
+    category: business
+  - id: com.fedex.ida.android
+    name: FedEx Mobile
+    category: business
+  - id: com.walmart.squiggly
+    name: MyWalmart
+    category: business
+  - id: com.squareup
+    name: 'Square Point of Sale: Payment'
+    category: business
+  - id: com.Slack
+    name: Slack
+    category: business
+  - id: com.facebook.pages.app
+    name: Meta Business Suite
+    category: business
+  - id: com.cisco.wx2.android
+    name: Webex
+    category: business
+  - id: com.microsoft.intune
+    name: Microsoft Intune
+    category: business
+  - id: com.shopify.mobile
+    name: 'Shopify: Sell online/in person'
+    category: business
+  - id: io.labhouse.invoicesapp
+    name: Invoice Maker - Invoice Fly
+    category: business
+  - id: com.glassdoor.app
+    name: Glassdoor | Jobs & Careers
+    category: business
+  - id: com.fiverr.fiverr
+    name: Fiverr - Freelance Service
+    category: business
+  - id: us.zoom.videomeetings
+    name: Zoom Workplace
+    category: business
+  - id: com.linkedin.android
+    name: 'LinkedIn: Community & Network'
+    category: business
+  - id: com.thegrizzlylabs.geniusscan.free
+    name: Genius Scan - PDF Scanner
+    category: business
+  - id: com.mobisystems.office
+    name: 'MobiOffice: Word, Sheets, PDF'
+    category: business
+  - id: x1Trackmaster.x1Trackmaster
+    name: AppSheet
+    category: business
+  - id: nps.nps
+    name: NPS by Protean eGov
+    category: business
+  - id: com.azure.authenticator
+    name: Microsoft Authenticator
+    category: business
+  - id: com.duosecurity.duomobile
+    name: Duo Mobile
+    category: business
+  - id: com.facebook.adsmanager
+    name: Meta Ads Manager
+    category: business
+  - id: pdf.tap.scanner
+    name: PDF Scanner app - TapScanner
+    category: business
+  - id: com.anydesk.anydeskandroid
+    name: AnyDesk Remote Desktop
+    category: business
+  - id: com.teamviewer.teamviewer.market.mobile
+    name: TeamViewer Remote Control
+    category: business
+  - id: ru.hh.android
+    name: Поиск работы на hh
+    category: business
+  - id: com.redarbor.computrabajo
+    name: Computrabajo Ofertas de Empleo
+    category: business
+  - id: com.bayt
+    name: Bayt.com Jobs - Job Search App
+    category: business
+  - id: com.jobhai.jobs
+    name: Job Hai - Search Job, Vacancy
+    category: business
+  - id: com.jobkorea.app
+    name: 잡코리아 - ai 커리어 플랫폼 취업 이직 직장 채용
+    category: business
+  - id: com.jobstreet.jobstreet
+    name: 'Jobstreet: Smart job matching'
+    category: business
+  - id: com.kariyer.androidproject
+    name: Kariyer.net Job Search
+    category: business
+  - id: com.poleemploi.poleemploietmoi
+    name: Mon Espace France Travail
+    category: business
+  - id: kr.co.alba.webappalba.m
+    name: 알바천국 - 모든 생애 모든 알바
+    category: business
+  - id: naukriApp.appModules.login
+    name: Naukri - Job Search App India
+    category: business
+  - id: net.infojobs.mobile.android
+    name: InfoJobs - Job Search
+    category: business
+  - id: com.pinterest
+    name: Pinterest
+    category: lifestyle
+  - id: com.tmobile.tuesdays
+    name: T-Life
+    category: lifestyle
+  - id: com.amazon.dee.app
+    name: Amazon Alexa
+    category: lifestyle
+  - id: com.nextdoor
+    name: 'Nextdoor: Neighborhood Network'
+    category: lifestyle
+  - id: com.lgeha.nuts
+    name: LG ThinQ
+    category: lifestyle
+  - id: com.tuya.smart
+    name: Tuya- Smart Life, Smart Living
+    category: lifestyle
+  - id: com.tplink.iot
+    name: TP-Link Tapo
+    category: lifestyle
+  - id: com.astrotalk
+    name: Astrotalk - Talk to Astrologer
+    category: lifestyle
+  - id: com.requapp.requ
+    name: 'AttaPoll Surveys: Earn Money'
+    category: lifestyle
+  - id: interior.home.design.ai
+    name: Home AI - AI Interior Design
+    category: lifestyle
+  - id: com.roborock.smart
+    name: Roborock
+    category: lifestyle
+  - id: mydiary.journal.diary.diarywithlock.diaryjournal.secretdiary
+    name: My Diary - Daily Diary Journal
+    category: lifestyle
+  - id: com.yarnpal.ai
+    name: YarnPal - Crochet for Beginner
+    category: lifestyle
+  - id: com.wachanga.superchat
+    name: ChatGO - AI Chat Assistant
+    category: lifestyle
+  - id: com.tvtwo.highest.paying.cash.app.make.money.surveys.rewards.free.income
+    name: Make Money - Cash Earning App
+    category: lifestyle
+  - id: com.angcosmin.couple
+    name: Couple Joy - Relationship App
+    category: lifestyle
+  - id: com.happyverse.diarywithlock
+    name: 'Daily Journal: Diary with lock'
+    category: lifestyle
+  - id: com.tsua.my.secret.diary.lock.photo
+    name: My Secret Diary with Lock
+    category: lifestyle
+  - id: com.instaastro.onlineastrology
+    name: 'InstaAstro: Talk to Astrologer'
+    category: lifestyle
+  - id: com.application.zomato.district
+    name: 'District: Movies Events Dining'
+    category: lifestyle
+  - id: com.google.android.apps.chromecast.app
+    name: Google Home
+    category: lifestyle
+  - id: com.tuya.smartlife
+    name: SmartLife- Smart Living
+    category: lifestyle
+  - id: com.samsung.android.oneconnect
+    name: SmartThings
+    category: lifestyle
+  - id: com.kashkick.kashkickapp
+    name: 'KashKick: Get paid to have fun'
+    category: lifestyle
+  - id: com.prodege.swagbucksmobile
+    name: Swagbucks Play Games + Surveys
+    category: lifestyle
+  - id: com.point4more.ios.tak.user.prod
+    name: Takko Friends
+    category: lifestyle
+  - id: com.uxlayer.wipoint
+    name: 다이소몰 – 온라인 국민가게
+    category: lifestyle
   lookback_days: 7
-  ratings: [1, 2, 3]
-
+  ratings:
+  - 1
+  - 2
+  - 3
 indeed:
   queries:
-    - "operations associate"
-    - "data analyst"
-    - "business analyst"
-    - "marketing operations"
+  - operations associate
+  - data analyst
+  - business analyst
+  - marketing operations
   lookback_days: 7
   fallback: apify
-
 wellfound:
   queries: []
   lookback_days: 7

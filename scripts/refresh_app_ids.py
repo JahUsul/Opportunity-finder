@@ -1,7 +1,9 @@
 """Refresh app_ids in config/sources.yaml from Apple and Google Play top charts.
 
-Idempotent: overwrites the `app_ids` lists with the current top 50 per category
-in productivity, business, and lifestyle (150 entries per store).
+Idempotent: overwrites the `app_ids` lists. App Store gets a single top-50
+deduped list (categories are meaningless on Apple's marketing feed — see
+`fetch_apple_top`). Play Store gets a per-category top-50 (the Play category
+pages do filter correctly).
 
     uv run python scripts/refresh_app_ids.py
 """
@@ -19,14 +21,7 @@ import yaml
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOURCES_YAML = PROJECT_ROOT / "config" / "sources.yaml"
 
-CATEGORIES = ("productivity", "business", "lifestyle")
-
-# Apple Marketing Tools feed genre IDs.
-APPLE_GENRES = {
-    "productivity": 6007,
-    "business": 6000,
-    "lifestyle": 6012,
-}
+PLAY_CATEGORIES = ("productivity", "business", "lifestyle")
 
 # Google Play category constants (per google_play_scraper.Category) are upper-case.
 PLAY_CATEGORY_CONSTANTS = {
@@ -36,39 +31,30 @@ PLAY_CATEGORY_CONSTANTS = {
 }
 
 
-def fetch_apple_top(category: str, *, country: str = "us", limit: int = 50) -> list[dict]:
-    genre_id = APPLE_GENRES[category]
+# Apple's RSS marketing feed ignores the `?genre=N` query param —
+# all genres return the same top-50. We collect once and don't
+# tag categories on Apple entries. (Verified 2026-05-19; the
+# legacy itunes.apple.com/rss endpoint does filter by genre but
+# is deprecated and out of scope for v0. Revisit if Apple
+# restores filtering or we need more app surface.)
+def fetch_apple_top(*, country: str = "us", limit: int = 50) -> list[dict]:
     url = (
         f"https://rss.applemarketingtools.com/api/v2/{country}/apps/top-free/"
-        f"{limit}/apps.json?genre={genre_id}"
+        f"{limit}/apps.json"
     )
     # Apple redirects this domain to rss.marketingtools.apple.com; httpx is opt-in unlike requests.
     resp = httpx.get(url, timeout=30.0, follow_redirects=True)
     resp.raise_for_status()
     data = resp.json()
     apps: list[dict] = []
+    seen: set[str] = set()
     for item in data.get("feed", {}).get("results", []):
-        apps.append(
-            {
-                "id": str(item["id"]),
-                "name": item.get("name", ""),
-                "slug": _slug_from_url(item.get("url", "")),
-                "category": category,
-            }
-        )
+        app_id = str(item["id"])
+        if app_id in seen:
+            continue
+        seen.add(app_id)
+        apps.append({"id": app_id, "name": item.get("name", "")})
     return apps
-
-
-def _slug_from_url(url: str) -> str:
-    if not url:
-        return ""
-    parts = url.rstrip("/").split("/")
-    # e.g., https://apps.apple.com/us/app/microsoft-excel/id342792525
-    if "app" in parts:
-        idx = parts.index("app")
-        if idx + 1 < len(parts):
-            return parts[idx + 1]
-    return ""
 
 
 _PLAY_APP_ID_RE = re.compile(r"/store/apps/details\?id=([a-zA-Z][\w.]+)")
@@ -128,13 +114,11 @@ def main() -> int:
 
     cfg = yaml.safe_load(SOURCES_YAML.read_text()) or {}
 
-    apple_apps: list[dict] = []
-    for cat in CATEGORIES:
-        print(f"  apple: fetching top 50 / {cat}...", file=sys.stderr)
-        apple_apps.extend(fetch_apple_top(cat))
+    print("  apple: fetching top 50 (single overall list)...", file=sys.stderr)
+    apple_apps = fetch_apple_top()
 
     play_apps: list[dict] = []
-    for cat in CATEGORIES:
+    for cat in PLAY_CATEGORIES:
         print(f"  play:  fetching top 50 / {cat}...", file=sys.stderr)
         play_apps.extend(fetch_play_top(cat))
 
