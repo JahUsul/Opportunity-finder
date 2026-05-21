@@ -30,7 +30,8 @@ class Config:
     anthropic_key: str | None
     github_token: str | None
     sheet_id: str | None
-    gsheet_sa_path: str | None
+    oauth_client_path: str | None
+    oauth_token_path: str | None
     apify_token: str | None
     smtp: SmtpConfig
     notify_to: str | None
@@ -72,7 +73,8 @@ def load_config(project_root: Path | None = None) -> Config:
         anthropic_key=os.getenv("ANTHROPIC_API_KEY"),
         github_token=os.getenv("GITHUB_TOKEN"),
         sheet_id=os.getenv("SHEET_ID"),
-        gsheet_sa_path=os.getenv("GOOGLE_SHEETS_SA_PATH"),
+        oauth_client_path=os.getenv("GOOGLE_OAUTH_CLIENT_PATH"),
+        oauth_token_path=os.getenv("GOOGLE_OAUTH_TOKEN_PATH"),
         apify_token=os.getenv("APIFY_TOKEN"),
         smtp=smtp,
         notify_to=os.getenv("NOTIFY_TO"),

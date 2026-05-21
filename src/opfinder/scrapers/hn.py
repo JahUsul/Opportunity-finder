@@ -26,6 +26,11 @@ _TOP_LEVEL_COMMENT_CAP = 10
 class HNScraper:
     name = "hn"
 
+    @classmethod
+    def is_configured(cls, source_cfg: dict | None = None) -> bool:
+        cfg = source_cfg or {}
+        return bool(cfg.get("enabled", True))
+
     def __init__(
         self,
         *,

@@ -50,9 +50,15 @@ class Scorer:
         model: str = DEFAULT_MODEL,
         *,
         client: Any | None = None,
-        concurrency: int = 5,
+        concurrency: int = 2,
     ) -> None:
-        self._client = client if client is not None else anthropic.AsyncAnthropic(api_key=api_key)
+        # concurrency=2 + SDK's exponential backoff on 429 keeps us under the
+        # 50 RPM tier ceiling for claude-haiku without explicit pacing.
+        # See first-run incident notes in milestone 5.
+        if client is not None:
+            self._client = client
+        else:
+            self._client = anthropic.AsyncAnthropic(api_key=api_key, max_retries=5)
         self._model = model
         self._semaphore = asyncio.Semaphore(concurrency)
         self._tokens_in = 0
@@ -121,6 +127,10 @@ class Scorer:
             return
         self._tokens_in += int(getattr(usage, "input_tokens", 0) or 0)
         self._tokens_out += int(getattr(usage, "output_tokens", 0) or 0)
+
+    def cost(self) -> float:
+        """Total USD spent so far on this Scorer instance."""
+        return self._projected_cost()
 
     def _projected_cost(self) -> float:
         return (

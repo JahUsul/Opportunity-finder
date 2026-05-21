@@ -1,42 +1,47 @@
 [
     {
-        "userName": "frustrated_pm",
+        "id": 1001,
+        "user_name": "frustrated_pm",
         "rating": 2,
         "title": "Crashes every time I open a recurring event",
-        "review": "I've been using this for two years and it crashed three times this week alone. Sync to Google is unreliable. I paid for premium and now it's worse than before.",
+        "content": "I've been using this for two years and it crashed three times this week alone. Sync to Google is unreliable. I paid for premium and now it's worse than before.",
         "date": "2026-05-15T10:30:00",
-        "isEdited": false
+        "app_version": "4.2.1"
     },
     {
-        "userName": "happy_user",
+        "id": 1002,
+        "user_name": "happy_user",
         "rating": 5,
         "title": "Love it",
-        "review": "Five star app, no notes.",
+        "content": "Five star app, no notes.",
         "date": "2026-05-16T09:00:00",
-        "isEdited": false
+        "app_version": "4.2.1"
     },
     {
-        "userName": "solo_realtor",
+        "id": 1003,
+        "user_name": "solo_realtor",
         "rating": 1,
         "title": "Where did the iPad layout go?",
-        "review": "Update broke the iPad layout. Cannot find my saved templates anymore. I'd pay double for the old version back.",
+        "content": "Update broke the iPad layout. Cannot find my saved templates anymore. I'd pay double for the old version back.",
         "date": "2026-05-17T08:15:00",
-        "isEdited": false
+        "app_version": "4.2.1"
     },
     {
-        "userName": "",
+        "id": 1004,
+        "user_name": "",
         "rating": 3,
         "title": "Anon feedback",
-        "review": "Some neutral thoughts.",
+        "content": "Some neutral thoughts.",
         "date": "2026-05-14T12:00:00",
-        "isEdited": false
+        "app_version": "4.2.0"
     },
     {
-        "userName": "long_time_user",
+        "id": 1005,
+        "user_name": "long_time_user",
         "rating": 2,
         "title": "Used to be great",
-        "review": "From before the window.",
+        "content": "From before the window.",
         "date": "2026-03-01T12:00:00",
-        "isEdited": false
+        "app_version": "4.0.0"
     }
 ]

@@ -30,7 +30,7 @@ This doc is the build spec. The one-pager is the why and the what; this is the h
 
 The pipeline runs once a week on Friday morning, in five sequential stages:
 
-1. **Scrape.** Pull recent posts from six scrapers across four source categories.
+1. **Scrape.** Pull recent posts from four scrapers across three source categories. (App Store and Play Store scrapers are built and unit-tested but disabled in v0 — see §5.1.)
 2. **Dedupe.** Drop anything seen in the last 4 weeks via a local SQLite table.
 3. **Score (machine).** For each surviving candidate, get Claude Haiku to score pain, money, and buyer-quality from the text (source-aware prompt). Compute machine_total.
 4. **Enrich (GitHub).** For candidates clearing triage threshold, query GitHub for fork-eligible repos; score OSS leverage (0–5) and assign lane (fast/greenfield).
@@ -41,7 +41,7 @@ Friday morning, Jason opens the sheet, triages top 50 (Y/N/maybe), full-scores t
 ```
 ┌──────────┐    ┌────────┐    ┌──────────┐    ┌────────────┐    ┌──────────┐    ┌───────┐
 │ Scrapers │ -> │ Dedup  │ -> │ Scorer   │ -> │ Enrichment │ -> │ Sheet    │ -> │ Email │
-│ (6)      │    │ SQLite │    │ Haiku    │    │ GitHub API │    │ writer   │    │ SMTP  │
+│ (4)      │    │ SQLite │    │ Haiku    │    │ GitHub API │    │ writer   │    │ SMTP  │
 └──────────┘    └────────┘    └──────────┘    └────────────┘    └──────────┘    └───────┘
 ```
 
@@ -210,9 +210,9 @@ class ScraperBase(Protocol):
 
 **hn.py** — Firebase API (`https://hacker-news.firebaseio.com/v0/`). Pulls "Ask HN" and "Show HN" from past 7 days. Body = post text + top-level comments.
 
-**app_store.py** — `app-store-scraper` library. Configured list of apps (in `sources.yaml`) — start with top 50 apps in Productivity, Business, and Lifestyle categories. Pulls reviews from past 7 days, only ratings 1–3 (negative reviews carry pain signal; 5-star reviews don't).
+**app_store.py** — `app-store-web-scraper` library (swapped from archived `app-store-scraper` on 2026-05-20, see `docs/supply-chain-vets/m3.md`). Configured list of apps (in `sources.yaml`). Pulls reviews from past 7 days, only ratings 1–3 (negative reviews carry pain signal; 5-star reviews don't). **Disabled in v0** (`enabled: false` in `config/sources.yaml`): the top-50-by-category app list tested in m5 surfaced complaints about mega-apps (Uber, DoorDash, OneDrive) that don't fit the solo-operator ICP. Code retained for v1+ re-enablement with curated vertical app lists.
 
-**play_store.py** — `google-play-scraper` library. Same logic as app_store.
+**play_store.py** — `google-play-scraper` library. Same logic as app_store. **Also disabled in v0** for the same ICP reason.
 
 **indeed.py** — HTML scraping with `httpx` + `selectolax`. Query terms in `sources.yaml` (start with "operations associate", "data analyst", "business analyst", "marketing operations"). Past 7 days. On 2 consecutive failures (HTTP 403/429 or empty results), fall back to Apify ([Indeed Scraper](https://apify.com/dtrungtin/indeed-scraper) or equivalent).
 
@@ -353,6 +353,12 @@ def run():
 
     dedup = DedupStore(cfg.db_path)
     new_candidates = dedup.filter_new(all_candidates)
+    # Cap per-run scoring volume to scoring.max_candidates_per_week (default 200).
+    # Random sample seeded by today's ISO date for determinism within a single run.
+    # Added 2026-05-20 after first live run produced 2,400+ candidates — see m5 notes.
+    if len(new_candidates) > cfg.scoring["max_candidates_per_week"]:
+        rng = random.Random(today().isoformat())
+        new_candidates = rng.sample(new_candidates, cfg.scoring["max_candidates_per_week"])
 
     scorer = Scorer(cfg.anthropic_key)
     asyncio.run(score_all(scorer, new_candidates))
@@ -367,7 +373,7 @@ def run():
         c.lane = "fast" if c.oss >= cfg.lane_oss_cutoff else "greenfield"
         c.machine_total = c.machine_total_text() + c.oss
 
-    sheet = SheetWriter(cfg.gsheet_sa_path, cfg.sheet_id)
+    sheet = SheetWriter(cfg.oauth_client_path, cfg.oauth_token_path, cfg.sheet_id)
     url = sheet.write_week(new_candidates, today())
 
     Notifier(cfg.smtp).send_ready_email(url, stats=summarize(new_candidates))
@@ -383,6 +389,7 @@ def run():
 
 ```yaml
 reddit:
+  enabled: true
   subreddits:
     - automation
     - aiautomations
@@ -399,23 +406,28 @@ reddit:
   lookback_days: 7
 
 hn:
+  enabled: true
   query_types: [ask_hn, show_hn]
   lookback_days: 7
 
+# App stores: built + tested but disabled in v0. See §5.1 and §13.
+# Each scraper's is_configured() returns False when enabled is False, so main.py
+# skips them with a "not enabled or credentials not configured" log line.
 app_store:
-  app_ids:  # populated during build week 1
-    - 1234567890
-    - ...
+  enabled: false
+  app_ids: [...]
   categories: [productivity, business, lifestyle]
   lookback_days: 7
   ratings: [1, 2, 3]
 
 play_store:
+  enabled: false
   app_ids: [...]
   lookback_days: 7
   ratings: [1, 2, 3]
 
 indeed:
+  enabled: true
   queries:
     - "operations associate"
     - "data analyst"
@@ -425,6 +437,7 @@ indeed:
   fallback: apify
 
 wellfound:
+  enabled: true
   queries: [...]
   lookback_days: 7
   fallback: apify
@@ -556,12 +569,12 @@ No CI in v0. Tests run on demand via `uv run pytest`.
 ## 10. Operating notes
 
 **Costs (expected monthly).**
-- Haiku scoring: ~$25 (3 calls/candidate × 150 candidates/week × 4 weeks × ~$0.014/1k tokens)
+- Haiku scoring: ~$5–$15 (3 calls/candidate × ~100–200 candidates/week × 4 weeks × ~$0.014/1k tokens). Estimate revised downward 2026-05-20 after disabling app stores; pre-pivot the Play Store alone produced 500+/week, dominating both the candidate cap and the cost projection. Post-pivot, Reddit + HN + Indeed/Wellfound is expected to land comfortably inside the 200-candidate-per-week cap.
 - GitHub API: free for authenticated PAT (5,000 req/hr; we use ~200/week)
 - Google Sheets API: free
 - Gmail SMTP: free
 - Apify (if engaged): $25
-- **Total expected: $25–$50/mo.** Matches the one-pager's envelope.
+- **Total expected: $10–$40/mo.** Inside the one-pager's $50/mo envelope.
 
 **Secrets handling.** All secrets in `.env` (gitignored). Google service account JSON in `config/secrets/` (gitignored). Service account has access only to the one designated spreadsheet; no other Google scope.
 
@@ -645,13 +658,13 @@ Each "weekend" = one Saturday morning, 3–4 hours. Dashboard work always preemp
 | 3 | Jun 13–14 | App Store + Play Store scrapers + unit tests; supply-chain vet of `app-store-scraper` and `google-play-scraper` per OSS guide criteria | Scrape both, dump JSON; vet recorded in milestone PR (license, maintainer, recent commits, open CVEs) |
 | 4 | Jun 20–21 | Scorer (Haiku integration, all 3 text prompts, both buyer variants), Layer-2 injection pre-scan, reasoning-discard policy + unit tests | Score a fixture set; review a sample by eye; budget guard works; injection patterns module has ≥20 patterns with unit tests; verified that `reasoning` never appears in sheet/email/non-DEBUG logs |
 | 5 | Jun 27–28 | Sheet writer + notifier; first end-to-end dry run with the 4 scrapers built so far | Sheet appears; email arrives; no scoring errors on 50 real candidates |
-| 6 | Jul 4–5 | Indeed + Wellfound HTML scrapers; Apify client; failure-tracking | Real scrape of both; if either fails, Apify fallback engages; logs show which path was used |
-| 7 | Jul 9 (Thu eve) | Final pre-launch dry run; review all 6 sources; promote.py script | Dry run produces a sheet that looks right; promote.py creates a folder stub from a test row |
+| 6 | Jul 4–5 | Indeed + Wellfound HTML scrapers + Apify client + failure-tracking; GitHub enrichment layer (license-aware match scoring per §5.4) | Real scrape of Indeed + Wellfound; if either fails, Apify fallback engages; GitHub enrichment runs on triage-clearing candidates and writes oss/lane/repo cols. Scope confirmed 2026-05-20: app store work is out — m3 scrapers are disabled in v0 — so m6 absorbs the GitHub enrichment that was previously slated to fold into m5/m6. |
+| 7 | Jul 9 (Thu eve) | Final pre-launch dry run; review all 4 active sources; promote.py script | Dry run produces a sheet that looks right; promote.py creates a folder stub from a test row |
 | 8 | **Jul 10 (Fri 06:00)** | **First scheduled run** | Cron fires; sheet created; email received by 07:00; Jason reviews 09:00–10:30 |
 | 9 | Jul 17, 24, 31 | Weekly runs + threshold calibration | Notes on which rows Jason liked vs the score; week 4 = pick threshold |
 | 10 | Aug 7 | Hard stop / lock / post-mortem | Either pipeline is healthy and threshold is locked, or v0 is shelved |
 
-GitHub enrichment is folded into weekend 5 or 6 depending on how scoring goes — it's cheap to add once the scorer is wired and `Candidate` is fully populated. The expanded license tier logic from §5.4 (three tiers, BUSL date-aware, GPL-with-FOSS-exception detection, dual-license resolution) belongs to whichever weekend ships enrichment; budget half a day for the edge cases.
+GitHub enrichment is anchored to weekend 6 (locked 2026-05-20 alongside the app-store pivot — see m6 row above). The expanded license tier logic from §5.4 (three tiers, BUSL date-aware, GPL-with-FOSS-exception detection, dual-license resolution) ships with enrichment; budget half a day for the edge cases.
 
 ---
 
@@ -659,7 +672,7 @@ GitHub enrichment is folded into weekend 5 or 6 depending on how scoring goes �
 
 Things I'm choosing to defer until the code exists:
 
-- **App Store / Play Store app IDs.** The shape (top 50 in Productivity/Business/Lifestyle) is fixed; the actual ID list is best populated by scraping store rankings in weekend 3, not by guessing now.
+- **v1+ may revisit app store sources with curated vertical lists** (e.g., top 30 productivity apps for realtors, top 30 CRM apps for solo agents) targeting Jason's ICP directly. The top-50-by-category surface tested in m5 (2026-05-19) surfaced mega-app complaints (Uber, DoorDash, OneDrive) that don't fit the solo-operator buildability frame, so v0 disables both `app_store` and `play_store` via `enabled: false` in `config/sources.yaml`. Scraper code, fixtures, and supply-chain vets are preserved.
 - **Indeed/Wellfound query terms.** Starting set is in the config. Real query tuning happens in weekends 6–7 when we see what comes back.
 - **Triage threshold (18/30) for GitHub enrichment.** Starting guess. Adjust if GitHub API cost is non-trivial (it shouldn't be) or if too few/many candidates trigger enrichment.
 - **Buyer-quality nuance for r/realtors and r/realestateadvice.** These have a real estate-specific lexicon. May need a third buyer prompt variant if the B2B prompt under-scores their genuine buyer signal. Decide after week 1.
@@ -671,7 +684,7 @@ Things I'm choosing to defer until the code exists:
 
 By Friday July 10:
 
-- [ ] All six scrapers return at least 10 candidates each in a dry run.
+- [ ] All four enabled scrapers (Reddit, HN, Indeed, Wellfound) return at least 10 candidates each in a dry run.
 - [ ] Dedup correctly skips a re-injected fixture.
 - [ ] All three text-score prompts produce sensible scores on the fixture set (eyeballed by Jason).
 - [ ] OSS enrichment finds at least one fork-eligible match on a fixture pain.

@@ -23,6 +23,11 @@ _TITLE_SNIPPET_LEN = 80
 class PlayStoreScraper:
     name = "play_store"
 
+    @classmethod
+    def is_configured(cls, source_cfg: dict | None = None) -> bool:
+        cfg = source_cfg or {}
+        return bool(cfg.get("enabled", True))
+
     def __init__(
         self,
         *,
@@ -31,6 +36,7 @@ class PlayStoreScraper:
         country: str = "us",
         lang: str = "en",
         count: int = 100,
+        reviews_per_app: int = 5,
         reviews_fn: Callable[..., Any] | None = None,
         sort: Any = None,
         **_extra: Any,
@@ -40,6 +46,7 @@ class PlayStoreScraper:
         self._country = country
         self._lang = lang
         self._count = int(count)
+        self._reviews_per_app = int(reviews_per_app)
         self._reviews_fn = reviews_fn
         self._sort = sort
 
@@ -82,6 +89,7 @@ class PlayStoreScraper:
             kwargs["sort"] = sort
         result = reviews_fn(entry["id"], **kwargs)
         reviews_list = result[0] if isinstance(result, tuple) else result
+        kept = 0
         for review in reviews_list or []:
             if review.get("score") not in self._ratings:
                 continue
@@ -89,6 +97,9 @@ class PlayStoreScraper:
             if at is not None and at < since:
                 continue
             yield self._to_candidate(entry, review)
+            kept += 1
+            if kept >= self._reviews_per_app:
+                break
 
     def _to_candidate(self, entry: dict, review: dict) -> Candidate:
         app_name = entry["name"]

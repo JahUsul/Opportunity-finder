@@ -15,8 +15,25 @@ log = logging.getLogger(__name__)
 _BODY_SEP = "\n\n---\n\n"
 
 
+_REDDIT_ENV_VARS = ("REDDIT_CLIENT_ID", "REDDIT_CLIENT_SECRET", "REDDIT_USER_AGENT")
+
+
+def _is_placeholder(value: str) -> bool:
+    if not value:
+        return True
+    v = value.strip().upper()
+    return v == "REPLACE_ME" or v.startswith("REPLACE_ME") or v == "<TODO>"
+
+
 class RedditScraper:
     name = "reddit"
+
+    @classmethod
+    def is_configured(cls, source_cfg: dict | None = None) -> bool:
+        cfg = source_cfg or {}
+        if not cfg.get("enabled", True):
+            return False
+        return all(not _is_placeholder(os.getenv(k, "")) for k in _REDDIT_ENV_VARS)
 
     def __init__(
         self,

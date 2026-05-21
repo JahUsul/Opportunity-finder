@@ -8,9 +8,10 @@ dependencies = [
     "python-dotenv>=1.0",
     "praw>=7.7",
     "httpx>=0.27",
-    "app-store-scraper>=0.3.5,<0.4",
+    "app-store-web-scraper>=0.2.0,<0.3",
     "google-play-scraper>=1.2.7,<2",
     "anthropic>=0.103,<1",
+    "gspread>=6.2.1",
 ]
 
 [dependency-groups]

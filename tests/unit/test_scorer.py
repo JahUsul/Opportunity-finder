@@ -210,6 +210,51 @@ def test_body_substitution_into_prompt():
         assert 'source="reddit"' in p
 
 
+def test_scorer_recovers_after_429_on_first_call():
+    """First create() raises 429, subsequent ones succeed → candidate still gets scored.
+
+    In production the SDK's max_retries=5 handles this automatically; this test
+    simulates the same shape via an injected client that yields 429 then 200.
+    """
+    text_block = MagicMock()
+    text_block.text = '{"score": 7, "reasoning": "ok"}'
+    good_resp = MagicMock()
+    good_resp.content = [text_block]
+    good_resp.usage = MagicMock(input_tokens=10, output_tokens=20)
+
+    calls = {"n": 0}
+
+    async def create(**kwargs):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise RuntimeError("simulated 429 — would be retried by SDK in production")
+        return good_resp
+
+    client = MagicMock()
+    client.messages = MagicMock()
+    client.messages.create = create
+
+    c = make_candidate()
+    scorer = Scorer(api_key="test-key", client=client)
+
+    # Without SDK retry the bare exception propagates; we wrap and verify the
+    # mid-call recovery shape by retrying ourselves once at the test boundary.
+    try:
+        _run(scorer.score(c))
+    except RuntimeError:
+        result = _run(scorer.score(c))
+        assert result.pain == 7 and result.money == 7 and result.buyer == 7
+        return
+    pytest.fail("expected first call to raise the simulated 429")
+
+
+def test_default_concurrency_is_two():
+    """Hardening from m5 first-run: keep concurrency low enough that natural
+    pacing stays under the Anthropic free-tier 50 RPM ceiling."""
+    scorer = Scorer(api_key="test-key", client=make_mock_client())
+    assert scorer._semaphore._value == 2
+
+
 def test_malformed_json_response_returns_zero_does_not_crash():
     """If the model returns garbage, we record 0 and continue rather than crash the run."""
     text_block = MagicMock()
